@@ -1,0 +1,36 @@
+{
+  "technology": [
+    "https://feeds.feedburner.com/venturebeat/SZYF",
+    "https://techcrunch.com/feed/",
+    "https://www.wired.com/feed/rss",
+    "https://arstechnica.com/rss-feeds/",
+    "https://www.theverge.com/rss/index.xml",
+    "https://feeds.feedburner.com/Mashable"
+  ],
+  "science": [
+    "https://www.nature.com/nature.rss",
+    "https://www.sciencemag.org/rss/news_current.xml",
+    "https://www.newscientist.com/feed/home/",
+    "https://www.sciencedaily.com/rss/all.xml"
+  ],
+  "ai": [
+    "https://artificialintelligence-news.com/feed/",
+    "https://www.ai-news.com/feed/"
+  ],
+  "business": [
+    "https://feeds.bloomberg.com/markets/news.rss",
+    "https://feeds.a.dj.com/rss/RSSWorldNews.xml",
+    "https://feeds.fortune.com/fortune/headlines"
+  ],
+  "general": [
+    "https://rss.cnn.com/rss/edition.rss",
+    "https://feeds.bbci.co.uk/news/rss.xml",
+    "https://www.reuters.com/rssFeed/worldNews",
+    "https://feeds.npr.org/1001/rss.xml"
+  ],
+  "world news": [
+    "https://www.aljazeera.com/xml/rss/all.xml",
+    "https://feeds.bbci.co.uk/news/world/rss.xml",
+    "https://www.reuters.com/rssFeed/worldNews"
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "interests": [
+    "technology",
+    "science",
+    "world news",
+    "business",
+    "artificial intelligence"
+  ],
+  "sources": [],
+  "language": "en",
+  "max_articles_per_feed": 20,
+  "enable_full_text": true,
+  "preferred_formats": ["epub", "html"],
+  "exclude_domains": ["example.com", "spam-site.com"],
+  "keywords_boost": [
+    "AI",
+    "technology",
+    "innovation",
+    "breakthrough",
+    "research"
+  ],
+  "keywords_filter": ["spam", "advertisement", "clickbait"]
+}
