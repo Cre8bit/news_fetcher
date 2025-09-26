@@ -26,16 +26,57 @@ def clean_text(text: str) -> str:
     return text
 
 
+def clean_article_text(text: str) -> str:
+    """Clean article text while preserving paragraph structure and readability."""
+    if not text:
+        return ""
+    
+    # Decode HTML entities first
+    import html
+    text = html.unescape(text)
+    
+    # Remove control characters but preserve newlines, carriage returns, and tabs
+    text = ''.join(char for char in text if unicodedata.category(char)[0] != 'C' or char in '\n\r\t')
+    
+    # Split into lines to preserve paragraph structure
+    lines = text.split('\n')
+    cleaned_lines = []
+    
+    for line in lines:
+        # For each line, preserve leading tabs/spaces (indentation)
+        # but normalize multiple spaces within the content to single spaces
+        leading_whitespace = ''
+        content = line.lstrip()
+        
+        if content:  # If line has content
+            # Extract leading whitespace (tabs/spaces for indentation)
+            leading_whitespace = line[:len(line) - len(content)]
+            # Clean only the content part, normalize multiple spaces to single space
+            content = re.sub(r' +', ' ', content.rstrip())
+            cleaned_lines.append(leading_whitespace + content)
+        else:
+            # Empty line - preserve it for paragraph breaks
+            cleaned_lines.append('')
+    
+    # Join lines back and clean up excessive blank lines (more than 2 consecutive)
+    result = '\n'.join(cleaned_lines)
+    result = re.sub(r'\n{3,}', '\n\n', result)  # Max 2 consecutive newlines
+    
+    return result.strip()
+
+
 def normalize_url(url: str) -> str:
     """Normalize URL for consistent handling."""
     if not url:
         return ""
     
-    # Add protocol if missing
+    url = url.strip()
+    if not url:
+        return ""
+    
     if not url.startswith(('http://', 'https://')):
         url = 'https://' + url
     
-    # Remove trailing slash
     url = url.rstrip('/')
     
     return url
@@ -46,11 +87,14 @@ def extract_domain(url: str) -> str:
     if not url:
         return ""
     
+    url = url.strip()
+    if not url:
+        return ""
+    
     try:
         parsed = urlparse(normalize_url(url))
         domain = parsed.netloc.lower()
         
-        # Remove www prefix
         if domain.startswith('www.'):
             domain = domain[4:]
         
@@ -199,11 +243,12 @@ def format_file_size(size_bytes: int) -> str:
     
     size_names = ["B", "KB", "MB", "GB"]
     i = 0
-    while size_bytes >= 1024 and i < len(size_names) - 1:
-        size_bytes /= 1024.0
+    size_float = float(size_bytes)
+    while size_float >= 1024 and i < len(size_names) - 1:
+        size_float /= 1024.0
         i += 1
     
-    return f"{size_bytes:.1f} {size_names[i]}"
+    return f"{size_float:.1f} {size_names[i]}"
 
 
 def validate_url(url: str) -> bool:

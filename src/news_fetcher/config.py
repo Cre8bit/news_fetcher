@@ -1,11 +1,9 @@
 """Configuration management for News Fetcher MCP Server."""
 
 import json
-import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from dataclasses import dataclass, asdict
-from datetime import datetime
 
 
 @dataclass
@@ -62,18 +60,6 @@ class Config:
     
     def _load_preferences(self) -> None:
         """Load user preferences from file."""
-        default_preferences = UserPreferences(
-            interests=["technology", "science", "world news"],
-            sources=[],
-            language="en",
-            max_articles_per_feed=20,
-            enable_full_text=True,
-            preferred_formats=["epub", "html"],
-            exclude_domains=["example.com"],
-            keywords_boost=["AI", "technology", "innovation"],
-            keywords_filter=["spam", "advertisement"]
-        )
-        
         if self.preferences_file.exists():
             try:
                 with open(self.preferences_file, 'r') as f:
@@ -81,12 +67,9 @@ class Config:
                     self.preferences = UserPreferences(**data)
             except (json.JSONDecodeError, TypeError) as e:
                 print(f"Error loading preferences: {e}")
-                self.preferences = default_preferences
-                self._save_preferences()
         else:
-            self.preferences = default_preferences
-            self._save_preferences()
-    
+            raise FileNotFoundError(f"Preferences file not found: {self.preferences_file}")
+        
     def _save_preferences(self) -> None:
         """Save user preferences to file."""
         with open(self.preferences_file, 'w') as f:
@@ -94,24 +77,6 @@ class Config:
     
     def _load_sources(self) -> None:
         """Load RSS/Atom sources from file."""
-        default_sources = {
-            "technology": [
-                "https://feeds.feedburner.com/venturebeat/SZYF",
-                "https://techcrunch.com/feed/",
-                "https://www.wired.com/feed/rss",
-                "https://arstechnica.com/rss-feeds/"
-            ],
-            "science": [
-                "https://www.nature.com/nature.rss",
-                "https://www.sciencemag.org/rss/news_current.xml",
-                "https://www.newscientist.com/feed/home/"
-            ],
-            "general": [
-                "https://rss.cnn.com/rss/edition.rss",
-                "https://feeds.bbci.co.uk/news/rss.xml",
-                "https://www.reuters.com/rssFeed/worldNews"
-            ]
-        }
         
         if self.sources_file.exists():
             try:
@@ -119,12 +84,9 @@ class Config:
                     self.sources = json.load(f)
             except json.JSONDecodeError as e:
                 print(f"Error loading sources: {e}")
-                self.sources = default_sources
-                self._save_sources()
         else:
-            self.sources = default_sources
-            self._save_sources()
-    
+            raise FileNotFoundError(f"Sources file not found: {self.sources_file}")
+        
     def _save_sources(self) -> None:
         """Save sources to file."""
         with open(self.sources_file, 'w') as f:
@@ -132,21 +94,6 @@ class Config:
     
     def _load_credentials(self) -> None:
         """Load credentials from file."""
-        default_credentials = {
-            "llm": {
-                "provider": "openai",
-                "api_key": None,
-                "model": "gpt-3.5-turbo",
-                "base_url": None,
-                "max_tokens": 1000,
-                "temperature": 0.7
-            },
-            "news_apis": {
-                "newsapi_key": None,
-                "guardian_key": None,
-                "nyt_key": None
-            }
-        }
         
         if self.credentials_file.exists():
             try:
@@ -154,12 +101,9 @@ class Config:
                     self.credentials = json.load(f)
             except json.JSONDecodeError as e:
                 print(f"Error loading credentials: {e}")
-                self.credentials = default_credentials
-                self._save_credentials()
         else:
-            self.credentials = default_credentials
-            self._save_credentials()
-    
+            raise FileNotFoundError(f"Credentials file not found: {self.credentials_file}")
+
     def _save_credentials(self) -> None:
         """Save credentials to file."""
         with open(self.credentials_file, 'w') as f:

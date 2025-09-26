@@ -32,7 +32,7 @@ def list_sources():
             print(f"  - {url}")
 
 
-def update_llm_config(provider: str, api_key: str, model: str = None):
+def update_llm_config(provider: str, api_key: str, model: str | None = None):
     """Update LLM configuration."""
     config = Config()
     

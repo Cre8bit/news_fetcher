@@ -1,6 +1,5 @@
 """MCP tools for news fetching, processing, and management."""
 
-import asyncio
 import hashlib
 import json
 import time
@@ -192,7 +191,6 @@ def fetch_article(url: str, config: Optional[Config] = None) -> Dict[str, Any]:
     if not config:
         config = Config()
     
-    # Normalize URL
     url = normalize_url(url)
     
     # Check cache first
@@ -205,23 +203,25 @@ def fetch_article(url: str, config: Optional[Config] = None) -> Dict[str, Any]:
                 cached_data = json.load(f)
                 cache_time = datetime.fromisoformat(cached_data['timestamp'])
                 
-                # Use cache if less than TTL
                 if datetime.now() - cache_time < timedelta(seconds=config.cache_ttl):
                     return cached_data
         except (json.JSONDecodeError, KeyError, ValueError):
             pass
     
     try:
-        # Fetch the page
         print(f"Fetching article: {url}")
         response = requests.get(url, timeout=15, headers={
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Accept-Encoding': 'gzip, deflate',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1'
         })
         response.raise_for_status()
         
         html_content = response.text
         
-        # Try Trafilatura first
         extracted_content = trafilatura.extract(
             html_content,
             output_format='json',
@@ -238,7 +238,6 @@ def fetch_article(url: str, config: Optional[Config] = None) -> Dict[str, Any]:
             try:
                 content_json = json.loads(extracted_content)
                 
-                # Check if we got good content
                 text_length = len(content_json.get('text', ''))
                 if text_length > 200:  # Minimum content threshold
                     article_data = {
@@ -263,10 +262,8 @@ def fetch_article(url: str, config: Optional[Config] = None) -> Dict[str, Any]:
             
             doc = Document(html_content)
             
-            # Parse with BeautifulSoup for additional metadata
             soup = BeautifulSoup(html_content, 'html.parser')
             
-            # Extract metadata
             title = doc.title() or ""
             if not title:
                 title_tag = soup.find('title')
@@ -275,29 +272,40 @@ def fetch_article(url: str, config: Optional[Config] = None) -> Dict[str, Any]:
             author = ""
             author_meta = soup.find('meta', attrs={'name': 'author'}) or soup.find('meta', attrs={'property': 'article:author'})
             if author_meta:
-                author = author_meta.get('content', '')
+                try:
+                    attrs = getattr(author_meta, 'attrs', {})
+                    author = attrs.get('content', '') if attrs else ""
+                except (AttributeError, TypeError):
+                    author = ""
             
             published = ""
             date_meta = soup.find('meta', attrs={'property': 'article:published_time'}) or soup.find('meta', attrs={'name': 'date'})
             if date_meta:
-                published = date_meta.get('content', '')
+                try:
+                    attrs = getattr(date_meta, 'attrs', {})
+                    published = attrs.get('content', '') if attrs else ""
+                except (AttributeError, TypeError):
+                    published = ""
             
             description = ""
             desc_meta = soup.find('meta', attrs={'name': 'description'}) or soup.find('meta', attrs={'property': 'og:description'})
             if desc_meta:
-                description = desc_meta.get('content', '')
+                try:
+                    attrs = getattr(desc_meta, 'attrs', {})
+                    description = attrs.get('content', '') if attrs else ""
+                except (AttributeError, TypeError):
+                    description = ""
             
-            # Extract main content
             content_html = doc.summary()
             content_soup = BeautifulSoup(content_html, 'html.parser')
             text_content = content_soup.get_text(separator='\n', strip=True)
             
             article_data = {
-                'title': clean_text(title),
-                'text': clean_text(text_content),
-                'author': clean_text(author),
+                'title': title.strip(),
+                'text': text_content, 
+                'author': str(author).strip(),
                 'published': published,
-                'description': clean_text(description),
+                'description': description.strip(),
                 'url': url,
                 'domain': extract_domain(url),
                 'language': '',
@@ -306,14 +314,12 @@ def fetch_article(url: str, config: Optional[Config] = None) -> Dict[str, Any]:
             }
         
         if article_data:
-            # Add extraction metadata
             article_data.update({
                 'fetched_at': datetime.now().isoformat(),
                 'success': True,
                 'error': None
             })
             
-            # Cache the result
             with open(cache_path, 'w') as f:
                 json.dump(article_data, f, indent=2)
             
