@@ -150,7 +150,7 @@ Focus on the most newsworthy and impactful stories. Write in a professional news
     
     def _call_openai(self, prompt: str) -> Optional[str]:
         """Call OpenAI API."""
-        url = self.llm_config.base_url or "https://api.openai.com/v1/chat/completions"
+        url = self.llm_config.base_url
         
         headers = {
             "Authorization": f"Bearer {self.llm_config.api_key}",
@@ -174,12 +174,12 @@ Focus on the most newsworthy and impactful stories. Write in a professional news
     
     def _call_anthropic(self, prompt: str) -> Optional[str]:
         """Call Anthropic API."""
-        url = self.llm_config.base_url or "https://api.anthropic.com/v1/messages"
+        url = self.llm_config.base_url
         
         headers = {
             "x-api-key": self.llm_config.api_key,
             "Content-Type": "application/json",
-            "anthropic-version": "2023-06-01"
+            "anthropic-version": "2024-06-01"
         }
         
         data = {

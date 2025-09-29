@@ -149,8 +149,8 @@ def search_feeds(
                 'timestamp': datetime.now().isoformat(),
                 'articles': feed_articles
             }
-            with open(cache_path, 'w') as f:
-                json.dump(cache_data, f, indent=2)
+            with open(cache_path, 'w', encoding='utf-8') as f:
+                json.dump(cache_data, f, indent=2, ensure_ascii=False)
                 
         except Exception as e:
             errors.append(f"Error fetching feed {feed_url}: {str(e)}")
@@ -196,12 +196,11 @@ def fetch_article(url: str, config: Optional[Config] = None) -> Dict[str, Any]:
     # Check cache first
     cache_key = hashlib.md5(url.encode()).hexdigest()
     cache_path = config.get_cache_path(f"article_{cache_key}")
-    
     if cache_path.exists():
         try:
             with open(cache_path, 'r') as f:
                 cached_data = json.load(f)
-                cache_time = datetime.fromisoformat(cached_data['timestamp'])
+                cache_time = datetime.fromisoformat(cached_data['fetched_at'])
                 
                 if datetime.now() - cache_time < timedelta(seconds=config.cache_ttl):
                     return cached_data
@@ -320,8 +319,8 @@ def fetch_article(url: str, config: Optional[Config] = None) -> Dict[str, Any]:
                 'error': None
             })
             
-            with open(cache_path, 'w') as f:
-                json.dump(article_data, f, indent=2)
+            with open(cache_path, 'w', encoding='utf-8') as f:
+                json.dump(article_data, f, indent=2, ensure_ascii=False)
             
             return article_data
         else:

@@ -1,4 +1,4 @@
-# News Fetcher MCP Server
+# News Fetcher MCP Server (Work In Progress)
 
 A comprehensive Model Context Protocol (MCP) server for fetching, processing, and serving news content with EPUB generation and OPDS support for KOReader.
 
@@ -12,50 +12,6 @@ A comprehensive Model Context Protocol (MCP) server for fetching, processing, an
 - **Configurable Preferences**: Manage interests, sources, credentials, and filtering preferences
 - **Caching System**: Intelligent caching to reduce API calls and improve performance
 - **Multiple LLM Support**: OpenAI, Anthropic, and local LLM support (Ollama, LocalAI)
-
-## Architecture
-
-```
-news_fetcher/
-├── src/news_fetcher/
-│   ├── __init__.py          # Package metadata
-│   ├── main.py              # MCP server and main entry point
-│   ├── config.py            # Configuration management
-│   ├── tools.py             # MCP tool implementations
-│   ├── llm_client.py        # LLM integration for ranking/summarization
-│   ├── opds_server.py       # OPDS server for KOReader
-│   └── utils.py             # Utility functions
-├── data/
-│   ├── config/              # Configuration files
-│   │   ├── preferences.json # User preferences and interests
-│   │   ├── sources.json     # RSS/Atom feed sources
-│   │   └── credentials.json # API keys and credentials
-│   ├── cache/               # Cached feed and article data
-│   └── epubs/               # Generated EPUB files
-├── static/                  # Static files for OPDS server
-├── main.py                  # Entry point
-├── pyproject.toml           # Project configuration
-└── README.md               # This file
-```
-
-## Installation
-
-1. Clone or set up the repository:
-
-```bash
-cd /path/to/news_fetcher
-```
-
-2. Install dependencies using uv:
-
-```bash
-uv install
-```
-
-3. Configure your preferences and credentials:
-   - Edit `data/config/preferences.json` for your interests and preferences
-   - Edit `data/config/sources.json` to add/modify RSS sources
-   - Edit `data/config/credentials.json` to add API keys for LLM providers
 
 ## MCP Tools
 
@@ -110,6 +66,25 @@ The server provides the following MCP tools:
    - Parameters: `preferences` (dict)
    - Returns: Updated preferences
 
+## Installation
+
+1. Clone or set up the repository:
+
+```bash
+cd /path/to/news_fetcher
+```
+
+2. Install dependencies using uv:
+
+```bash
+uv install
+```
+
+3. Configure your preferences and credentials:
+   - Edit `data/config/preferences.json` for your interests and preferences
+   - Edit `data/config/sources.json` to add/modify RSS sources
+   - Edit `data/config/credentials.json` to add API keys for LLM providers
+
 ## Configuration
 
 ### User Preferences (`data/config/preferences.json`)
@@ -154,10 +129,6 @@ Supported LLM providers:
 ### Running the MCP Server
 
 ```bash
-# Using uv
-uv run python main.py
-
-# Or directly
 python main.py
 ```
 
@@ -225,47 +196,6 @@ The server comes with curated RSS sources for various topics. You can:
 - **Business**: Bloomberg, WSJ, Fortune
 - **General**: CNN, BBC, Reuters, NPR
 
-## Development
-
-### Adding New Tools
-
-1. Implement the tool function in `src/news_fetcher/tools.py`
-2. Register it in `src/news_fetcher/main.py` using `@mcp.tool()`
-3. Add any required utility functions to `src/news_fetcher/utils.py`
-
-### Testing
-
-```bash
-# Run tests (when implemented)
-uv run pytest
-
-# Code formatting
-uv run black src/
-uv run isort src/
-
-# Type checking
-uv run mypy src/
-```
-
-## Troubleshooting
-
-### Common Issues
-
-1. **LLM not working**: Check your API keys in `data/config/credentials.json`
-2. **Feeds not loading**: Verify RSS URLs in `data/config/sources.json`
-3. **OPDS not accessible**: Check if port 8000 is available and firewall settings
-4. **EPUB generation fails**: Check write permissions in `data/epubs/`
-
-### Logs and Debugging
-
-The server prints verbose logs to help with debugging:
-
-- Feed fetching progress
-- Article extraction methods used
-- LLM API calls and responses
-- EPUB generation steps
-- OPDS server status
-
 ## Contributing
 
 1. Fork the repository
@@ -290,4 +220,3 @@ Key dependencies:
 - **fastapi**: OPDS server
 - **requests**: HTTP client
 - **beautifulsoup4**: HTML parsing
-- **pydantic**: Data validation
